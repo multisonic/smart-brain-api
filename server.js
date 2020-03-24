@@ -1,27 +1,37 @@
 const express = require("express");
+const bcrypt = require('bcrypt-nodejs');
+const cors = require('cors');
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 const database = {
   users: [
     {
       id: "123",
       name: "John",
+      password: 'cookies',
       email: "john@gmail.com",
-      password: "cookies",
       entries: 0, //used to track scores
       date: new Date() // js method to create date
     },
     {
       id: "124",
       name: "Sally",
+      password: 'bananas',
       email: "sally@gmail.com",
-      password: "bananas",
       entries: 0, //used to track scores
       date: new Date() // js method to create date
     }
+  ],
+  login: [
+    {
+      id: '123',
+      hash: '',
+      email: 'john@gmail.com'
+    },
   ]
 };
 
@@ -30,6 +40,12 @@ app.get("/", (req, res) => {
 });
 
 app.post("/signin", (req, res) => {
+    bcrypt.compare("saladkit", '$2a$10$JDCKtnaWkW9RmP5Cyzuid.Vx7JjKMHXOHxbiQJ7h/VSuCMOJuiZ9m', function(err, res) {
+        console.log('first guess', res)
+    });
+    bcrypt.compare("veggies", '$2a$10$JDCKtnaWkW9RmP5Cyzuid.Vx7JjKMHXOHxbiQJ7h/VSuCMOJuiZ9m', function(err, res) {
+        console.log('second guess', res)
+    });
   if (
     req.body.email === database.users[0].email &&
     req.body.password === database.users[0].password
@@ -85,6 +101,18 @@ app.put("/image", (req, res) => {
       res.status(404).json("not found");
     }
   });
+
+// bcrypt.hash("bacon", null, null, function(err, hash) {
+//     // Store hash in your password DB.
+// });
+
+// // Load hash from your password DB.
+// bcrypt.compare("bacon", hash, function(err, res) {
+//     // res == true
+// });
+// bcrypt.compare("veggies", hash, function(err, res) {
+//     // res = false
+// });
 
 app.listen(3000, () => {
   console.log("app is running on port 3000");
