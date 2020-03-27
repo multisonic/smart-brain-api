@@ -92,18 +92,15 @@ app.post("/register", (req, res) => {
 
 app.get("/profile/:id", (req, res) => {
   const { id } = req.params;
-  let found = false;
-  // loop thru the users in array to find matching user
-  database.users.forEach(user => {
-    if (user.id === id) {
-      found = true;
-      return res.json(user);
-    }
-  });
-  if (!found) {
-    // ie NOT found
-    res.status(404).json("no such user");
-  }
+  db.select('*').from('users').where({id}) // we can do {id} instead of {id: id} bc prop/value are the same
+    .then( user => {
+      if (user.length) { // if user is greater than 0
+        res.json(user[0]);
+      } else {
+        res.status(400).json('User Not Found');
+      }
+  })
+  .catch(err => res.status(400).json('Error getting user'));
 });
 
 app.put("/image", (req, res) => {
