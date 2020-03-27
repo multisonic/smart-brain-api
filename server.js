@@ -105,18 +105,14 @@ app.get("/profile/:id", (req, res) => {
 
 app.put("/image", (req, res) => {
   const { id } = req.body; // we rec userId from the body
-  let found = false;
-  database.users.forEach(user => {
-    if (user.id === id) {
-      found = true;
-      user.entries++; // add 1 to the user entries
-      return res.json(user.entries); // display the updated entries
-    }
-  });
-  if (!found) {
-    // ie NOT found
-    res.status(404).json("not found");
-  }
+  db('users')
+  .where('id', '=', id)
+  .increment('entries', 1)
+  .returning('entries')
+  .then(entries => {
+    res.json(entries[0]);
+  })
+  .catch(err => res.status(400).json('unable to get entries'))
 });
 
 // bcrypt.hash("bacon", null, null, function(err, hash) {
